@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "author": "hadnet",
+  "name": "Tweet for dev",
+  "version": "1.0.1",
+  "description": "Provide devs with markdown and code syntax highlighting to improve code reading and enhance the copy experience in post tweets.",
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon-32.png",
+    "default_title": "Tweets as md"
+  },
+  "icons": {
+    "128": "icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://twitter.com/*",
+        "https://openai-api.hadnet.workers.dev/*"
+      ],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "permissions": ["tabs", "scripting", "activeTab", "notifications"],
+  "host_permissions": ["https://*/*"],
+  "web_accessible_resources": [
+    {
+      "resources": ["icon-128.png", "icon-64.png", "icon-32.png"],
+      "matches": []
+    },
+    {
+      "resources": ["a11y-light.css", "a11y-dark.css"],
+      "matches": ["https://twitter.com/*"]
+    }
+  ]
+}
