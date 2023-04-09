@@ -2,10 +2,10 @@ import hljs from 'highlight.js';
 import { marked } from 'marked';
 import { nonNullable } from '../../utils';
 import { IconNames, getIcon, type Color } from './modules/svg-icons';
-import { Actions, type Action, type OpenaiResponse } from '../../types';
-// import { toHtml } from 'hast-util-to-html';
+import { Actions, type Action } from '../../types';
 
-// console.log('Content script works!');
+let shimmer: HTMLDivElement;
+let loading = false;
 
 function convertToMarkdownAndHighlight(t: Element, color: Color) {
   if (t.textContent) {
@@ -79,7 +79,6 @@ function convertToMarkdownAndHighlight(t: Element, color: Color) {
     cardDOM.appendChild(langIconBtn);
 
     if (language.match(/tsx?$/)) {
-      let loading = false;
       const helpIconBtn = document.createElement('a');
       helpIconBtn.style.position = 'absolute';
       helpIconBtn.style.cursor = 'pointer';
@@ -89,7 +88,7 @@ function convertToMarkdownAndHighlight(t: Element, color: Color) {
       helpIconBtn.innerHTML = getIcon('openai', isDark ? '#d3d3d3' : '#545063');
 
       helpIconBtn.addEventListener('click', () => {
-        const shimmer = document.createElement('div');
+        shimmer = document.createElement('div');
         shimmer.style.display = 'flex';
         shimmer.style.flexDirection = 'column';
         shimmer.style.background = isDark ? '#1c1a23' : '#f1eae7';
@@ -102,27 +101,10 @@ function convertToMarkdownAndHighlight(t: Element, color: Color) {
         cardDOM.parentElement?.appendChild(shimmer);
         if (!loading) {
           loading = true;
-          chrome.runtime.sendMessage<Action, OpenaiResponse>(
-            {
-              action: Actions.fetchOpenAi,
-              payload: { code: codeString },
-            },
-            (data) => {
-              const setContent = (content: string, icon: IconNames = 'info') =>
-                `<div style="display: flex; flex-direction: row;"><div style="margin-right: 16px;">${getIcon(
-                  icon,
-                  isDark ? '#a8edff' : '#232323'
-                )}</div><div>${content}</div></div>`.trim();
-              if ('error' in data) {
-                shimmer.innerHTML = setContent(data.error, 'warning');
-              } else {
-                shimmer.style.padding = '20px';
-                shimmer.style.lineHeight = '150%';
-                shimmer.innerHTML = setContent(data.choices[0].text);
-              }
-              loading = false;
-            }
-          );
+          chrome.runtime.sendMessage<Action, Response>({
+            action: Actions.fetchOpenAi,
+            payload: { code: codeString },
+          });
         }
       });
       cardDOM.appendChild(helpIconBtn);
@@ -157,6 +139,26 @@ const observer = new MutationObserver((mutations) => {
 chrome.runtime.sendMessage<Action>({
   action: Actions.changeTheme,
   payload: { isDark },
+});
+
+chrome.runtime.onMessage.addListener((message: Action<string>) => {
+  switch (message.action) {
+    case Actions.stream: {
+      const data = message.payload;
+      loading = false;
+
+      const setContent = (content: string, icon: IconNames = 'info') =>
+        `<div style="display: flex; flex-direction: row;"><div style="margin-right: 16px;">${getIcon(
+          icon,
+          isDark ? '#a8edff' : '#232323'
+        )}</div><div>${content}</div></div>`.trim();
+
+      shimmer.style.padding = '20px';
+      shimmer.style.lineHeight = '150%';
+      shimmer.innerHTML = setContent(data ?? 'No response');
+      break;
+    }
+  }
 });
 
 theme.addEventListener('change', (event) => {

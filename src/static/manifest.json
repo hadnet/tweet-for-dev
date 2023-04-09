@@ -20,7 +20,8 @@
     {
       "matches": [
         "https://twitter.com/*",
-        "https://openai-api.hadnet.workers.dev/*"
+        "https://openai-api.hadnet.workers.dev/*",
+        "http://127.0.0.1:8787/*"
       ],
       "js": ["contentScript.js"]
     }

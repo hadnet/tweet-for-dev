@@ -24,9 +24,10 @@ export const enum Actions {
   copyToClipboard = 'copyToClipboard',
   fetchOpenAi = 'fetchOpenAi',
   changeTheme = 'changeTheme',
+  stream = 'streamText',
 }
 
-export type Action = {
+export type Action<T = any> = {
   action: Actions;
-  payload?: any;
+  payload?: T;
 };
