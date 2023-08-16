@@ -1,5 +1,12 @@
 
 
+## [1.1.1](https://github.com/hadnet/tweet-for-dev/compare/1.1.0...1.1.1) (2023-08-16)
+
+
+### Bug Fixes
+
+* system appearance responsivness ([605664d](https://github.com/hadnet/tweet-for-dev/commit/605664d14b9d9b32709266dff468f08164536a78))
+
 # [1.1.0](https://github.com/hadnet/tweet-for-dev/compare/1.0.1...1.1.0) (2023-04-09)
 
 
