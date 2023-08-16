@@ -7,13 +7,14 @@ import { Actions, type Action } from '../../types';
 let shimmer: HTMLDivElement;
 let loading = false;
 
-function convertToMarkdownAndHighlight(t: Element, color: Color) {
+function convertToMarkdownAndHighlight(t: Element, isDark: boolean) {
   if (t.textContent) {
     const tweet = t.textContent;
     // TODO: refactor this code in order to work with many code snippet chunks and not only one.
     const [start, codeString, end] = tweet?.split('```');
     if (!codeString) return;
     const [language] = codeString.split('\n');
+    const color: Color = isDark ? 'white' : 'black';
 
     const copyBtn = document.createElement('a');
     copyBtn.innerHTML = getIcon('copy', color);
@@ -120,17 +121,16 @@ const isDark = theme.matches;
 const observer = new MutationObserver((mutations) => {
   const theme = window.matchMedia('(prefers-color-scheme: dark)');
   const isDark = theme.matches;
-  const color = isDark ? 'white' : 'black';
   if (isInit) {
     const tweets = document.querySelectorAll('[data-testid="tweetText"]');
-    tweets.forEach((tweet) => convertToMarkdownAndHighlight(tweet, color));
+    tweets.forEach((tweet) => convertToMarkdownAndHighlight(tweet, isDark));
     isInit = false;
   }
   for (let mutation of mutations) {
     for (let node of mutation.addedNodes) {
       if (!(node instanceof HTMLElement)) continue;
       for (let tweet of node.querySelectorAll('[data-testid="tweetText"]')) {
-        convertToMarkdownAndHighlight(tweet, color);
+        convertToMarkdownAndHighlight(tweet, isDark);
       }
     }
   }

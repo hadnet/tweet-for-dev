@@ -6,6 +6,12 @@ let isDark: boolean;
 function setCSSTheme(isDark: boolean, tabId: number | undefined) {
   nonNullable(tabId);
   if (isDark) {
+    chrome.scripting.removeCSS({
+      files: ['a11y-light.css'],
+      target: {
+        tabId,
+      },
+    });
     chrome.scripting.insertCSS(
       {
         files: ['a11y-dark.css'],
@@ -17,13 +23,13 @@ function setCSSTheme(isDark: boolean, tabId: number | undefined) {
         console.log('Dark CSS inserted');
       }
     );
+  } else {
     chrome.scripting.removeCSS({
-      files: ['a11y-light.css'],
+      files: ['a11y-dark.css'],
       target: {
         tabId,
       },
     });
-  } else {
     chrome.scripting.insertCSS(
       {
         files: ['a11y-light.css'],
@@ -35,12 +41,6 @@ function setCSSTheme(isDark: boolean, tabId: number | undefined) {
         console.log('Light CSS inserted');
       }
     );
-    chrome.scripting.removeCSS({
-      files: ['a11y-dark.css'],
-      target: {
-        tabId,
-      },
-    });
   }
 }
 
